@@ -13,41 +13,35 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import {ThemeColors} from '../../constant/Colors';
 import {moderateScale, scale, verticalScale} from 'react-native-size-matters';
 import {ExclamationCircleIcon, MapIcon} from 'react-native-heroicons/outline';
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useContext, useEffect, useState} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import PlaceSeachTextInput from '../../components/PlaceSeachTextInput';
 import PlacelistCard from '../../components/PlaceListCard';
+import { LocationContext } from '../../context/LocationContext';
 
 function DropLocationSelector({navigation}) {
-  const [currentLocation, setCurrentLocation] = useState(null);
 
-  useEffect(() => {
-    const fetchCurrentLocation = async () => {
-      try {
-        const response = await AsyncStorage.multiGet(['latitude', 'longitude']);
-        console.log('async location', response[0][1]);
-        console.log('async location', response[1][1]);
-        setCurrentLocation({
-          latitude: response[0][1],
-          longitude: response[1][1],
-        });
-      } catch (er) {
-        console.error('async storage errror', er);
-      }
-    };
-    fetchCurrentLocation();
-  }, []);
+  const {pickupCon} = useContext(LocationContext)
+  console.log("pickupcon",pickupCon)
+
+  
 
   const [pickup, setPickup] = useState(null);
   const [drop, setDrop] = useState(null);
-  const [seachResult, setSeachResult] = useState([]);
+  const [pickupSeachResult, SetPickupSeachResult] = useState([]);
+  const [dropSeachResult, SetDropSeachResult] = useState([]);
   const [activeInput, setActiveInput] = useState(null);
-  const [origin, setOrigin] = useState(null);
+  const [origin, setOrigin] = useState(pickupCon && pickupCon.latitude ? pickupCon : null);
   const [destination, setDestination] = useState(null);
 
   const backNavigation = useCallback(() => {
     navigation.goBack();
   }, []);
+
+  const navigateToRoute = () =>{
+    navigation.navigate('RideDetails',{pickupLocation:origin,dropLocation:destination});
+    console.log(origin,destination)
+  }
 
   return (
     <SafeAreaView style={style.safeArea}>
@@ -61,6 +55,7 @@ function DropLocationSelector({navigation}) {
         <Text style={style.title}>Drop</Text>
       </View>
       <View style={style.lcPickerMainWrapper}>
+      {pickupCon?.latitude == null ? 
         <View style={style.warningWrapper}>
           <ExclamationCircleIcon color={'#cf6f32'} />
           <View style={{width: '90%', marginLeft: scale(5)}}>
@@ -68,7 +63,7 @@ function DropLocationSelector({navigation}) {
               We can't find you! Enter your pickup location for a smooth ride
             </Text>
           </View>
-        </View>
+        </View> : null}
         <View style={style.pickDropLogoWrapper}>
           <View
             style={{
@@ -80,10 +75,10 @@ function DropLocationSelector({navigation}) {
             
               <PlaceSeachTextInput
                 placeholder={'Pickup location'}
-                searchResult={setSeachResult}
+                searchResult={activeInput === 'pickup' ? SetPickupSeachResult : SetDropSeachResult}
                 value={pickup}
-                setter={setPickup}
-                userCurrentLocation={currentLocation}
+                setter={(text)=>setPickup(text)}
+                userCurrentLocation={pickupCon}
                 onFocus={() => setActiveInput('pickup')}
               />
           </View>
@@ -98,17 +93,17 @@ function DropLocationSelector({navigation}) {
             <MapPinIcon color={'red'} style={{opacity: 0.8}} />
             <PlaceSeachTextInput
               placeholder={'Drop location'}
-              searchResult={setSeachResult}
+              searchResult={activeInput === 'pickup' ? SetPickupSeachResult : SetDropSeachResult}
               value={drop}
-              setter={setDrop}
-              userCurrentLocation={currentLocation}
+              setter={(text)=>setDrop(text)}
+              userCurrentLocation={pickupCon}
               onFocus={() => setActiveInput('drop')}
             />
           </View>
         </View>
       </View>
 
-      <TouchableOpacity style={style.selectMapWapper}>
+      <TouchableOpacity style={style.selectMapWapper} onPress={navigateToRoute}>
         <MapIcon color={'gray'} size={scale(15)} />
         <Text style={style.selectMapText}>Select on map</Text>
       </TouchableOpacity>
@@ -117,7 +112,7 @@ function DropLocationSelector({navigation}) {
         style={{flex: 1, paddingTop: verticalScale(10)}}
         onPress={Keyboard.dismiss}>
         <FlatList
-          data={seachResult}
+          data={activeInput === 'pickup' ? pickupSeachResult : dropSeachResult}
           keyExtractor={(item, index) => `${item.place_id} - ${index}`}
           renderItem={({item}) => (
             <PlacelistCard
@@ -126,6 +121,7 @@ function DropLocationSelector({navigation}) {
                 activeInput === 'pickup' ? setOrigin : setDestination
               }
               inputSetter={activeInput === 'pickup' ? setPickup : setDrop}
+              searchData={activeInput === 'pickup' ? SetPickupSeachResult : SetDropSeachResult}
             />
           )}
           showsVerticalScrollIndicator={false}

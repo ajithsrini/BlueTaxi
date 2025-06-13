@@ -12,28 +12,19 @@ import {
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {ThemeColors} from '../../constant/Colors';
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useContext, useEffect, useState} from 'react';
 import Geolocation from 'react-native-geolocation-service';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Bars3Icon, MagnifyingGlassIcon} from 'react-native-heroicons/outline';
 import {MapPinIcon} from 'react-native-heroicons/solid';
-import {scale, verticalScale} from 'react-native-size-matters';
-import MapView, {Marker} from 'react-native-maps';
-
+import {moderateScale, scale, verticalScale} from 'react-native-size-matters';
+import MapView, {Marker, PROVIDER_GOOGLE} from 'react-native-maps';
+import {requestLocationPermission} from '../../utils/MapUtils';
+import { LocationContext } from '../../context/LocationContext';
 
 function HomeScreen({navigation}) {
 
-
-  const requestLocationPermission = async () => {
-    if (Platform.OS === 'android') {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-      );
-      return granted === PermissionsAndroid.RESULTS.GRANTED;
-    }
-    return true;
-  };
-
+  const {setPickupCon} = useContext(LocationContext)
   const checkGPS = () => {
     return new Promise((resolve, reject) => {
       Geolocation.getCurrentPosition(
@@ -53,132 +44,117 @@ function HomeScreen({navigation}) {
     });
   };
 
-  const [currentLocation, setCurrentLocation] = useState(null)
+  const [currentLocation, setCurrentLocation] = useState(null);
+  const [gpsStatus, setGpsStatus] = useState(null);
   const handleLocationCheck = async () => {
-    console.log('function running');
-    const permissionGranted = await PermissionsAndroid.check(
-      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-    );
+    const permission = await requestLocationPermission();
+    console.log('location permission enabled or not in home:', permission);
 
-    if (!permissionGranted) {
-      const requested = await requestLocationPermission();
-      if (!requested) {
-        Alert.alert('Permission Denied', 'Location access is required for this app.');
+    if (permission) {
+      const gpsEnabled = await checkGPS();
+      console.log('gps enabled or not in home:', gpsEnabled);
+      setGpsStatus(gpsEnabled);
+
+      if (!gpsEnabled) {
+        Alert.alert('GPS is Off', 'Please enable GPS to use this feature.');
         return;
       }
+
+      if (gpsEnabled) {
+        Geolocation.getCurrentPosition(
+          async position => {
+            try {
+              setCurrentLocation({
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude,
+              });
+              
+              await AsyncStorage.setItem(
+                'latitude',
+                position.coords.latitude.toString(),
+              );
+              await AsyncStorage.setItem(
+                'longitude',
+                position.coords.longitude.toString(),
+              );
+              console.log('latitude Home:', position.coords.latitude);
+              console.log('Longitude Home:', position.coords.longitude);
+            } catch (e) {
+              console.error('AsyncStorage error:', e);
+            }
+          },
+
+          error => {
+            Alert.alert('Error getting location', error.message);
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 15000,
+            maximumAge: 10000,
+            forceRequestLocation: true,
+            forceLocationManager: true,
+            showLocationDialog: true,
+          },
+        );
+      }
     }
-
-    const gpsEnabled = await checkGPS();
-    if (!gpsEnabled) {
-      Alert.alert('GPS is Off', 'Please enable GPS to use this feature.');
-      return;
-    }
-
-    if(gpsEnabled){
-    Geolocation.getCurrentPosition(
-      async position => {
-          try {
-            setCurrentLocation({
-                "latitude": position.coords.latitude,
-                "longitude":  position.coords.longitude
-            })
-            await AsyncStorage.setItem(
-              'latitude',
-              position.coords.latitude.toString(),
-            );
-            await AsyncStorage.setItem(
-              'longitude',
-              position.coords.longitude.toString(),
-            );
-            console.log('latitude Home:', position.coords.latitude);
-            console.log('Longitude Home:', position.coords.longitude);
-          } catch (e) {
-            console.error('AsyncStorage error:', e);
-          }
-        },
-
-      error => {
-        Alert.alert('Error getting location', error.message);
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 10000,
-        forceRequestLocation: true,
-        forceLocationManager: true,
-        showLocationDialog: true,
-      },
-    );}
   };
 
+  useEffect(() => {
+    const fetchLocationData = async () => {
+      await handleLocationCheck();
+    };
+    fetchLocationData();
+  }, []);
 
-useEffect(() => {
-  const fetchLocationData = async () => {
-    await handleLocationCheck();
-    // await getPickUp();
-  };
+  const navigateToDropLocation = useCallback(() => {
+    navigation.navigate('DropLocationSelector');
+    setPickupCon(currentLocation)
+  }, [navigation,currentLocation]);
 
-  fetchLocationData();
-}, []);
-
-
-  // const getPickUp = async () => {
-  //   const response = await AsyncStorage.multiGet(['latitude', 'longitude']);
-  //   console.log(
-  //     'pickup location',
-  //     'latitude',
-  //     response[0][1],
-  //     'longitude',
-  //     response[1][1],
-  //   );
-  // };
-
-  const navigateToDropLocation = useCallback(()=>{
-    navigation.navigate("DropLocationSelector")
-  },[navigation])
-
-  
   return (
     <SafeAreaView style={style.safeArea}>
-    <StatusBar barStyle={"dark-content"} />
+      <StatusBar barStyle={'dark-content'} />
       <View style={style.headerMainWrapper}>
         <View style={style.barIconWrapper}>
           <Bars3Icon color={ThemeColors.text1} size={scale(22)} />
         </View>
-        <TouchableOpacity style={style.searchWrapper} onPress={navigateToDropLocation}>
+        <TouchableOpacity
+          style={style.searchWrapper}
+          onPress={navigateToDropLocation}>
           <MagnifyingGlassIcon size={20} />
           <Text style={style.searchText}>Where are you going?</Text>
         </TouchableOpacity>
       </View>
-       <View style={{ flex: 1}}>
-       {currentLocation ?
-        <MapView
-          style={{ flex: 1 }}
-          initialRegion={{
-            latitude: currentLocation?.latitude,
-            longitude: currentLocation?.longitude,
-            latitudeDelta: 0.01,
-            longitudeDelta: 0.01,
-          }}
-        >
-          
-          <Marker coordinate={currentLocation}>
-
-            <MapPinIcon color={ThemeColors.primary}/>
-            
-            </Marker>
-          
-        </MapView>:
-        <View style={{flex:1,justifyContent:"center"}}>
-        <ActivityIndicator
-          size="large"
-          color={ThemeColors.primary}
-          
-        />
-        </View>
-        }
-
-      
+      <View style={{flex: 1}}>
+        {gpsStatus ? (
+          <>
+            {currentLocation ? (
+              <MapView
+                style={{flex: 1}}
+                initialRegion={{
+                  latitude: currentLocation?.latitude || 11.9386981,
+                  longitude: currentLocation?.longitude || 79.8320056,
+                  latitudeDelta: 0.01,
+                  longitudeDelta: 0.01,
+                }}>
+                <Marker coordinate={currentLocation}>
+                  <MapPinIcon color={ThemeColors.primary} />
+                </Marker>
+              </MapView>
+            ) : (
+              <View style={{flex: 1, justifyContent: 'center'}}>
+                <ActivityIndicator size="large" color={ThemeColors.primary} />
+              </View>
+            )}
+          </>
+        ) : (
+          <View style={{flex:1,justifyContent:"center",alignItems:"center"}}>
+            <Text style={{color: ThemeColors.text1,fontSize:moderateScale(15),fontWeight:"600"}}>
+              Please enable GPS to use this feature.
+            </Text>
+          </View>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -220,5 +196,3 @@ const style = StyleSheet.create({
     justifyContent: 'center',
   },
 });
-
-

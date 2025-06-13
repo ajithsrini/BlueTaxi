@@ -9,7 +9,8 @@ function PlaceSeachTextInput({
   value,
   setter,
   userCurrentLocation,
-  onFocus
+  onFocus,
+  onBlur
 }) {
   const apiKey = GOOGLE_MAPS_APIKEY;
   
@@ -56,11 +57,12 @@ function PlaceSeachTextInput({
         value={value}
         onChangeText={text => {
           searchPlaces(text);
-          setter(text);
+          setter();
         }}
         placeholderTextColor={'gray'}
         cursorColor={ThemeColors.primary}
         onFocus={onFocus}
+        onBlur={onBlur}
       />
     </View>
   );

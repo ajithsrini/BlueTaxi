@@ -5,6 +5,7 @@ import {
 import HomeScreen from '../screens/homeScreen/HomeScreen';
 import DropLocationSelector from '../screens/homeScreen/DropLocationSelector';
 import {TransitionPresets} from '@react-navigation/stack';
+import RideDetails from '../screens/homeScreen/RideDetails';
 
 const Stack = createStackNavigator();
 function AppStack() {
@@ -20,6 +21,7 @@ function AppStack() {
           ...TransitionPresets.ModalSlideFromBottomIOS
         }}
       />
+      <Stack.Screen name='RideDetails' component={RideDetails}/>
     </Stack.Navigator>
   );
 }

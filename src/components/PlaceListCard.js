@@ -3,14 +3,16 @@ import { MapPinIcon } from 'react-native-heroicons/solid';
 import { scale, verticalScale } from 'react-native-size-matters';
 import { ThemeColors } from '../constant/Colors';
 
-function PlacelistCard({data,locationSetter,inputSetter}) {
+function PlacelistCard({data,locationSetter,inputSetter,searchData}) {
 
     const setLocation = ()=>{
         locationSetter({
             "latitude":data.geometry.location.lat,
-            "longitude":data.geometry.location.lng
+            "longitude":data.geometry.location.lng,
+            "name": data.name
         })
         inputSetter(data.name)
+        searchData([])
     }
   return (
     <TouchableOpacity style={style.mainWapper} onPress={setLocation}>
