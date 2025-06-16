@@ -3,19 +3,30 @@ import { MapPinIcon } from 'react-native-heroicons/solid';
 import { scale, verticalScale } from 'react-native-size-matters';
 import { ThemeColors } from '../constant/Colors';
 
-function PlacelistCard({data,locationSetter,inputSetter,searchData}) {
+function PlacelistCard({data,locationSetter,inputSetter,searchData,pickupDetector}) {
 
     const setLocation = ()=>{
         locationSetter({
             "latitude":data.geometry.location.lat,
             "longitude":data.geometry.location.lng,
-            "name": data.name
+            "name": data.name,
+             "time": Date.now(),
         })
         inputSetter(data.name)
         searchData([])
     }
+
+    const pickupEditDetector = ()=>{
+        pickupDetector()
+
+    }
+
+    
   return (
-    <TouchableOpacity style={style.mainWapper} onPress={setLocation}>
+    <TouchableOpacity style={style.mainWapper} onPress={()=>{
+        setLocation()
+        {pickupDetector && pickupEditDetector()}
+    }}>
       <View style={style.kmWrapper}>
         <MapPinIcon size={scale(16)} style={style.mapPin} color={"gray"}/>
         <Text style={style.km}>2.4 km</Text>

@@ -49,7 +49,7 @@ const style = StyleSheet.create({
     paddingLeft:scale(5)
   },
   carType:{
-    fontSize:scale(15),
+    fontSize:scale(14),
     fontWeight:"600",
     color:ThemeColors.text1
   },
@@ -59,7 +59,7 @@ const style = StyleSheet.create({
     color:ThemeColors.primary 
  },
   price:{
-    fontSize:scale(14),
+    fontSize:scale(13),
     fontWeight:"600",
     color:ThemeColors.text1
   },

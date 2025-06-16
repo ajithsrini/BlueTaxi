@@ -7,16 +7,16 @@ export const requestLocationPermission = async () => {
     PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
   );
 
-  if(permissionGranted){
-    return true
+  if (permissionGranted) {
+    return true;
   }
-  
+
   if (!permissionGranted) {
     if (Platform.OS === 'android') {
       const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
       );
-     
+
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
         return true;
       } else if (granted === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
@@ -34,7 +34,29 @@ export const requestLocationPermission = async () => {
       }
     }
   }
-
 };
 
+import axios from 'axios';
 
+export const getAddressFromCoords = async (latitude, longitude) => {
+  if(!latitude || !longitude) return null
+  try {
+    const response = await axios.get(
+      `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${GOOGLE_MAPS_APIKEY}`,
+    );
+
+    if (response.data.status === 'OK') {
+
+      const format = response.data.results[0].formatted_address;
+      
+      console.log('Address:', format);
+      return format;
+    } else {
+      console.warn('Reverse geocoding failed:', response.data.status);
+      return null;
+    }
+  } catch (error) {
+    console.error('Reverse geocoding error:', error);
+    return null;
+  }
+};

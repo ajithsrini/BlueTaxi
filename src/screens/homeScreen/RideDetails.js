@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState,useRef} from 'react';
 import {
   View,
   StyleSheet,
@@ -35,8 +35,7 @@ const RideDetails = ({route}) => {
 
   console.log("route params",pickupLocation,dropLocation)
 
-//   const origin = {latitude: 11.9325599, longitude: 79.8359352} ; 
-//   const destination = {latitude: 11.9457889, longitude: 79.790388}; 
+  const mapRef = useRef(null);
 
   const origin = pickupLocation;
   const destination = dropLocation;
@@ -66,6 +65,19 @@ const RideDetails = ({route}) => {
   useEffect(() => {
     fetchRoute();
   }, []);
+  useEffect(() => {
+  if (routeCoords.length > 0 && mapRef.current) {
+    mapRef.current.fitToCoordinates([origin, destination], {
+      edgePadding: {
+        top: 50,
+        right: 70,
+        bottom: 50,
+        left: 70,
+      },
+      animated: true,
+    });
+  }
+}, [routeCoords]);
 
   return (
     <View style={styles.mainWrapper}>
@@ -76,6 +88,7 @@ const RideDetails = ({route}) => {
       />
       <View style={styles.container}>
         <MapView
+        ref={mapRef} 
           style={StyleSheet.absoluteFillObject}
           provider={PROVIDER_GOOGLE}
           initialRegion={{
@@ -115,7 +128,7 @@ const RideDetails = ({route}) => {
           <Text style={styles.availableVehiclesText}>Available Vehicles</Text>
         </View>
         <FlatList
-          data={carData}
+          data={carData.slice(0,10)}
           keyExtractor={(item, index) => `${item.distance}-${index}`}
           renderItem={({item}) => <VehicleListCard data={item} />}
           showsVerticalScrollIndicator={false}
@@ -245,6 +258,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 7,
     elevation: 10,
+    maxWidth:scale(150)
   },
   markerText: {
     marginHorizontal: scale(8),

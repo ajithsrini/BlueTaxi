@@ -101,11 +101,9 @@ function HomeScreen({navigation}) {
   };
 
   useEffect(() => {
-    const fetchLocationData = async () => {
-      await handleLocationCheck();
-    };
-    fetchLocationData();
+    handleLocationCheck();
   }, []);
+  
 
   const navigateToDropLocation = useCallback(() => {
     navigation.navigate('DropLocationSelector');

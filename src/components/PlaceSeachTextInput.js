@@ -31,7 +31,7 @@ function PlaceSeachTextInput({
     const lat = userCurrentLocation?.latitude || INITIAL_LAT;
     const lng = userCurrentLocation?.longitude || INITIAL_LNG;
     const radius = 4000;
-    console.log(userCurrentLocation)
+    // console.log(userCurrentLocation)
 
     const url = `${googleApisUrl}?query=${input}&location=${lat},${lng}&radius=${radius}&key=${apiKey}`;
 
