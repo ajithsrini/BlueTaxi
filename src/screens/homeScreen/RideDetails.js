@@ -1,4 +1,4 @@
-import React, {useEffect, useState,useRef} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import {
   View,
   StyleSheet,
@@ -11,8 +11,13 @@ import {
 import MapView, {Marker, Polyline, PROVIDER_GOOGLE} from 'react-native-maps';
 import PolyLineDecoder from '@mapbox/polyline';
 import {GOOGLE_MAPS_APIKEY} from '../../utils/MapUtils';
-import {SafeAreaView} from 'react-native-safe-area-context';
 import {ThemeColors} from '../../constant/Colors';
+import Gpay from '../../assets/images/svg/gPay.svg';
+import Wallet from '../../assets/images/svg/wallet.svg';
+import Promo from '../../assets/images/svg/promo.svg';
+import Phonepe from '../../assets/images/svg/phonepe.svg';
+import Paytm from '../../assets/images/svg/paytm.svg';
+import Money from '../../assets/images/svg/money.svg';
 import {
   moderateScale,
   s,
@@ -24,24 +29,54 @@ import {
   ChevronRightIcon,
   WalletIcon,
 } from 'react-native-heroicons/outline';
-import VehicleListCard from '../../components/VehicleListCard';
+import VehicleListCard from './components/VehicleListCard';
 import {carData} from '../../constant/VehicleData';
 import {MapPinIcon} from 'react-native-heroicons/solid';
 
+import CustomModel from '../../components/CustomModel';
+import PaymentModel from './components/PaymentComponent';
+
+const imageSource = {
+  'BlueTaxi Wallet': <Wallet height={scale(22)} width={scale(22)} />,
+  GPay: <Gpay height={scale(22)} width={scale(22)}/>,
+  Phonepe: <Phonepe height={scale(22)} width={scale(22)} />,
+  Paytm: <Paytm height={scale(22)} width={scale(22)} />,
+  Cash: <Money height={scale(22)} width={scale(22)} />,
+};
+
 const RideDetails = ({route}) => {
   const [routeCoords, setRouteCoords] = useState([]);
+  const [cashModel, setCashModel] = useState(false);
+  const [promoModel, setPromoModel] = useState(false);
+  const [paymentType, setPaymentType] = useState('Cash');
 
-  const{pickupLocation,dropLocation} = route.params
+  const {pickupLocation, dropLocation} = route.params;
 
-  console.log("route params",pickupLocation,dropLocation)
+  console.log('route params', pickupLocation, dropLocation);
 
   const mapRef = useRef(null);
 
   const origin = pickupLocation;
   const destination = dropLocation;
-
   const originName = pickupLocation.name;
   const destinationName = dropLocation.name;
+
+  // const origin = {
+  //   latitude: 11.9387014,
+  //   longitude: 79.8320014,
+  //   name: '30, Rue Kamatchi Amman Koil St',
+  //   time: 1750067896722,
+  // };
+
+  // const destination = {
+  //   latitude: 11.9457889,
+  //   longitude: 79.790388,
+  //   name: 'Shanmugapuram',
+  //   time: 1750067901815,
+  // };
+
+  // const originName = origin.name;
+  // const destinationName = destination.name;
 
   const apiKey = GOOGLE_MAPS_APIKEY;
 
@@ -65,19 +100,27 @@ const RideDetails = ({route}) => {
   useEffect(() => {
     fetchRoute();
   }, []);
+
   useEffect(() => {
-  if (routeCoords.length > 0 && mapRef.current) {
-    mapRef.current.fitToCoordinates([origin, destination], {
-      edgePadding: {
-        top: 50,
-        right: 70,
-        bottom: 50,
-        left: 70,
-      },
-      animated: true,
-    });
-  }
-}, [routeCoords]);
+    if (routeCoords.length > 0 && mapRef.current) {
+      mapRef.current.fitToCoordinates([origin, destination], {
+        edgePadding: {
+          top: 50,
+          right: 70,
+          bottom: 50,
+          left: 70,
+        },
+        animated: true,
+      });
+    }
+  }, [routeCoords]);
+
+  const toggleCashModel = () => {
+    setCashModel(!cashModel);
+  };
+  const togglePromoModel = () => {
+    setPromoModel(!promoModel);
+  };
 
   return (
     <View style={styles.mainWrapper}>
@@ -88,7 +131,7 @@ const RideDetails = ({route}) => {
       />
       <View style={styles.container}>
         <MapView
-        ref={mapRef} 
+          ref={mapRef}
           style={StyleSheet.absoluteFillObject}
           provider={PROVIDER_GOOGLE}
           initialRegion={{
@@ -100,15 +143,19 @@ const RideDetails = ({route}) => {
           <Marker coordinate={origin}>
             <View style={styles.markerWrapper}>
               <View style={styles.markertextWrapper}>
-                <Text style={styles.markerText} numberOfLines={1}>{originName}</Text>
+                <Text style={styles.markerText} numberOfLines={1}>
+                  {originName}
+                </Text>
               </View>
               <MapPinIcon color={'red'} />
             </View>
           </Marker>
           <Marker coordinate={destination}>
-             <View style={styles.markerWrapper}>
+            <View style={styles.markerWrapper}>
               <View style={styles.markertextWrapper}>
-                <Text style={styles.markerText} numberOfLines={1}>{destinationName}</Text>
+                <Text style={styles.markerText} numberOfLines={1}>
+                  {destinationName}
+                </Text>
               </View>
               <MapPinIcon color={'green'} />
             </View>
@@ -128,27 +175,31 @@ const RideDetails = ({route}) => {
           <Text style={styles.availableVehiclesText}>Available Vehicles</Text>
         </View>
         <FlatList
-          data={carData.slice(0,10)}
+          data={carData.slice(0, 10)}
           keyExtractor={(item, index) => `${item.distance}-${index}`}
           renderItem={({item}) => <VehicleListCard data={item} />}
           showsVerticalScrollIndicator={false}
+          contentContainerStyle={{paddingVertical:verticalScale(5)}}
         />
         <View style={styles.bookingWrapper}>
           <View style={styles.optionWrapper}>
-            <View style={styles.paymentWrapper}>
+            <TouchableOpacity
+              style={styles.paymentWrapper}
+              onPress={toggleCashModel}>
               <View style={styles.logoTextWrapper}>
-                <BanknotesIcon color={'green'} />
-                <Text style={styles.paymentText}>Payment</Text>
+                {imageSource[paymentType]}
+                <Text style={styles.paymentText}>{paymentType}</Text>
               </View>
               <ChevronRightIcon
                 size={scale(15)}
                 color={ThemeColors.text1}
                 strokeWidth={2.5}
               />
-            </View>
-            <View style={styles.promoWrapper}>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.promoWrapper}>
               <View style={styles.logoTextWrapper}>
-                <WalletIcon color={ThemeColors.primary} />
+                {/* <WalletIcon color={ThemeColors.primary} /> */}
+                <Promo height={scale(22)} width={scale(22)} />
                 <Text style={styles.paymentText}>Promo code</Text>
               </View>
               <ChevronRightIcon
@@ -156,13 +207,17 @@ const RideDetails = ({route}) => {
                 color={ThemeColors.text1}
                 strokeWidth={2.5}
               />
-            </View>
+            </TouchableOpacity>
           </View>
           <TouchableOpacity style={styles.confirmBtn}>
             <Text style={styles.confirmText}>Request</Text>
           </TouchableOpacity>
         </View>
       </View>
+
+      <CustomModel modelVisible={cashModel} setModelVisible={setCashModel}>
+        <PaymentModel toggleCashModel={toggleCashModel} setPaymentMethod={setPaymentType} paymentMethod={paymentType}/>
+      </CustomModel>
     </View>
   );
 };
@@ -179,14 +234,15 @@ const styles = StyleSheet.create({
     backgroundColor: ThemeColors.secondary,
     borderTopLeftRadius: scale(15),
     borderTopRightRadius: scale(15),
-    maxHeight: '45%',
+    maxHeight: '50%',
   },
   bookingWrapper: {
     backgroundColor: ThemeColors.lightGray,
     padding: scale(15),
     borderTopLeftRadius: scale(15),
     borderTopRightRadius: scale(15),
-    marginTop: verticalScale(5),
+    // marginTop: verticalScale(5),
+    borderRadius:scale(20)
   },
   optionWrapper: {
     flexDirection: 'row',
@@ -248,7 +304,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderBottomWidth: 1,
     borderBottomColor: 'lightgray',
-    marginBottom: verticalScale(5),
+    // marginBottom: verticalScale(5),
   },
   markerWrapper: {
     justifyContent: 'center',
@@ -258,7 +314,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 7,
     elevation: 10,
-    maxWidth:scale(150)
+    maxWidth: scale(150),
   },
   markerText: {
     marginHorizontal: scale(8),

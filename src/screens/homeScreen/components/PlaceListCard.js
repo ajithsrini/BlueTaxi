@@ -1,7 +1,7 @@
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import { MapPinIcon } from 'react-native-heroicons/solid';
 import { scale, verticalScale } from 'react-native-size-matters';
-import { ThemeColors } from '../constant/Colors';
+import { ThemeColors } from '../../../constant/Colors';
 
 function PlacelistCard({data,locationSetter,inputSetter,searchData,pickupDetector}) {
 

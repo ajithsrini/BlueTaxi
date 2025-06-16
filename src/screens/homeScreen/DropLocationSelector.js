@@ -14,9 +14,8 @@ import {ThemeColors} from '../../constant/Colors';
 import {moderateScale, scale, verticalScale} from 'react-native-size-matters';
 import {ExclamationCircleIcon, MapIcon} from 'react-native-heroicons/outline';
 import {useCallback, useContext, useEffect, useState} from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import PlaceSeachTextInput from '../../components/PlaceSeachTextInput';
-import PlacelistCard from '../../components/PlaceListCard';
+import PlaceSeachTextInput from './components/PlaceSeachTextInput';
+import PlacelistCard from './components/PlaceListCard';
 import {LocationContext} from '../../context/LocationContext';
 import {getAddressFromCoords} from '../../utils/MapUtils';
 
@@ -117,7 +116,7 @@ function DropLocationSelector({navigation}) {
               alignItems: 'center',
               paddingLeft: scale(5),
             }}>
-            <MapPinIcon color={'green'} style={{opacity: 0.8}} />
+            <MapPinIcon color={'green'} style={{opacity: 0.7}} />
 
             <PlaceSeachTextInput
               placeholder={'Pickup location'}
@@ -148,7 +147,7 @@ function DropLocationSelector({navigation}) {
               paddingTop: 2,
               paddingLeft: scale(5),
             }}>
-            <MapPinIcon color={'red'} style={{opacity: 0.8}} />
+            <MapPinIcon color={'red'} style={{opacity: 0.7}} />
             <PlaceSeachTextInput
               placeholder={'Drop location'}
               searchResult={

@@ -1,6 +1,6 @@
 import {StyleSheet, TextInput, View} from 'react-native';
-import {ThemeColors} from '../constant/Colors';
-import {GOOGLE_MAPS_APIKEY} from '../utils/MapUtils';
+import {ThemeColors} from '../../../constant/Colors';
+import {GOOGLE_MAPS_APIKEY} from '../../../utils/MapUtils';
 import {moderateScale, scale} from 'react-native-size-matters';
 
 function PlaceSeachTextInput({

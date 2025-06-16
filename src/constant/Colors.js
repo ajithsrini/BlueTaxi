@@ -3,5 +3,5 @@ export const ThemeColors ={
     secondary :"#fff",
     text1 :"#242e42",
     text2:"#c8c7cc",
-    lightGray:"#f6f7f9"
+    lightGray:"#f6f7f9",
 }
