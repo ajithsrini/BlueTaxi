@@ -1,7 +1,6 @@
-import { StyleSheet } from 'react-native';
 import Modal from 'react-native-modal';
 
-function CustomModel ({children,modelVisible,setModelVisible}){
+function CustomModel ({children,modelVisible,setModelVisible,justifyContent = "flex-start",hasBackdrop=false}){
     const toggleModal = () => {
         setModelVisible(!modelVisible);
     }
@@ -9,12 +8,13 @@ function CustomModel ({children,modelVisible,setModelVisible}){
         <Modal
         isVisible={modelVisible}
         onBackdropPress={toggleModal}
-        hasBackdrop={false}
+        hasBackdrop={hasBackdrop}
+        backdropOpacity={0.5}
         animationInTiming={300}
         animationOutTiming={300}
         onBackButtonPress={toggleModal}
-        backdropColor='white'
-        style={style.modelStyle}
+        backdropColor='black'
+        style={{justifyContent:justifyContent,margin:0}}
         onSwipeComplete={() => setModelVisible(false)}
         swipeDirection={"down"}
         >
@@ -25,9 +25,3 @@ function CustomModel ({children,modelVisible,setModelVisible}){
 }
 
 export default CustomModel
-const style = StyleSheet.create({
-    modelStyle:{
-        justifyContent:"flex-start",
-        margin:0
-    }
-})

@@ -49,7 +49,7 @@ export const getAddressFromCoords = async (latitude, longitude) => {
 
       const format = response.data.results[0].formatted_address;
       
-      console.log('Address:', format);
+      console.log('Address:', response.data.results[0]);
       return format;
     } else {
       console.warn('Reverse geocoding failed:', response.data.status);
@@ -59,4 +59,13 @@ export const getAddressFromCoords = async (latitude, longitude) => {
     console.error('Reverse geocoding error:', error);
     return null;
   }
+};
+export const parseAddress = (fullAddress) => {
+  if (!fullAddress) return { street: '', area: '' };
+  
+  const parts = fullAddress.split(',').toSpliced(0,1).toSpliced(2)
+  return {
+    street:parts.join(",").trim() || '',
+    area: fullAddress
+  };
 };

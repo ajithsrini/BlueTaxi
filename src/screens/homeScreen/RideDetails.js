@@ -18,27 +18,19 @@ import Promo from '../../assets/images/svg/promo.svg';
 import Phonepe from '../../assets/images/svg/phonepe.svg';
 import Paytm from '../../assets/images/svg/paytm.svg';
 import Money from '../../assets/images/svg/money.svg';
-import {
-  moderateScale,
-  s,
-  scale,
-  verticalScale,
-} from 'react-native-size-matters';
-import {
-  BanknotesIcon,
-  ChevronRightIcon,
-  WalletIcon,
-} from 'react-native-heroicons/outline';
+import {moderateScale, scale, verticalScale} from 'react-native-size-matters';
+import {ChevronRightIcon} from 'react-native-heroicons/outline';
 import VehicleListCard from './components/VehicleListCard';
 import {carData} from '../../constant/VehicleData';
 import {MapPinIcon} from 'react-native-heroicons/solid';
 
 import CustomModel from '../../components/CustomModel';
 import PaymentModel from './components/PaymentComponent';
+import PromoCodeComponent from './components/PromoCodeComponent';
 
 const imageSource = {
   'BlueTaxi Wallet': <Wallet height={scale(22)} width={scale(22)} />,
-  GPay: <Gpay height={scale(22)} width={scale(22)}/>,
+  GPay: <Gpay height={scale(22)} width={scale(22)} />,
   Phonepe: <Phonepe height={scale(22)} width={scale(22)} />,
   Paytm: <Paytm height={scale(22)} width={scale(22)} />,
   Cash: <Money height={scale(22)} width={scale(22)} />,
@@ -49,6 +41,7 @@ const RideDetails = ({route}) => {
   const [cashModel, setCashModel] = useState(false);
   const [promoModel, setPromoModel] = useState(false);
   const [paymentType, setPaymentType] = useState('Cash');
+  const [appliedPromo, setAppliedPromo] = useState('Promo Code');
 
   const {pickupLocation, dropLocation} = route.params;
 
@@ -147,7 +140,7 @@ const RideDetails = ({route}) => {
                   {originName}
                 </Text>
               </View>
-              <MapPinIcon color={'red'} />
+              <MapPinIcon color={'green'} />
             </View>
           </Marker>
           <Marker coordinate={destination}>
@@ -157,7 +150,7 @@ const RideDetails = ({route}) => {
                   {destinationName}
                 </Text>
               </View>
-              <MapPinIcon color={'green'} />
+              <MapPinIcon color={'red'} />
             </View>
           </Marker>
           {routeCoords.length > 0 && (
@@ -175,11 +168,11 @@ const RideDetails = ({route}) => {
           <Text style={styles.availableVehiclesText}>Available Vehicles</Text>
         </View>
         <FlatList
-          data={carData.slice(0, 10)}
+          data={carData.slice(0, 2)}
           keyExtractor={(item, index) => `${item.distance}-${index}`}
           renderItem={({item}) => <VehicleListCard data={item} />}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{paddingVertical:verticalScale(5)}}
+          contentContainerStyle={{paddingVertical: verticalScale(5)}}
         />
         <View style={styles.bookingWrapper}>
           <View style={styles.optionWrapper}>
@@ -196,11 +189,22 @@ const RideDetails = ({route}) => {
                 strokeWidth={2.5}
               />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.promoWrapper}>
+            <TouchableOpacity
+              style={styles.promoWrapper}
+              onPress={togglePromoModel}>
               <View style={styles.logoTextWrapper}>
                 {/* <WalletIcon color={ThemeColors.primary} /> */}
                 <Promo height={scale(22)} width={scale(22)} />
-                <Text style={styles.paymentText}>Promo code</Text>
+                <View style={{flex: 1}}>
+                  <Text style={styles.paymentText} numberOfLines={1}>
+                    {appliedPromo}
+                  </Text>
+                  {appliedPromo !== 'Promo Code' ? (
+                    <Text style={styles.codeApplied} numberOfLines={1}>
+                      Code applied
+                    </Text>
+                  ) : null}
+                </View>
               </View>
               <ChevronRightIcon
                 size={scale(15)}
@@ -216,7 +220,22 @@ const RideDetails = ({route}) => {
       </View>
 
       <CustomModel modelVisible={cashModel} setModelVisible={setCashModel}>
-        <PaymentModel toggleCashModel={toggleCashModel} setPaymentMethod={setPaymentType} paymentMethod={paymentType}/>
+        <PaymentModel
+          toggleCashModel={toggleCashModel}
+          setPaymentMethod={setPaymentType}
+          paymentMethod={paymentType}
+        />
+      </CustomModel>
+      <CustomModel
+        modelVisible={promoModel}
+        setModelVisible={setPromoModel}
+        justifyContent="flex-end"
+        hasBackdrop={true}>
+        <PromoCodeComponent
+          togglePromoModel={togglePromoModel}
+          appliedPromo={appliedPromo}
+          setAppliedPromo={text => setAppliedPromo(text)}
+        />
       </CustomModel>
     </View>
   );
@@ -242,7 +261,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: scale(15),
     borderTopRightRadius: scale(15),
     // marginTop: verticalScale(5),
-    borderRadius:scale(20)
+    borderRadius: scale(20),
   },
   optionWrapper: {
     flexDirection: 'row',
@@ -261,6 +280,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: ThemeColors.lightGray,
+    flex: 1,
   },
   promoWrapper: {
     flexDirection: 'row',
@@ -277,6 +297,15 @@ const styles = StyleSheet.create({
     fontSize: moderateScale(14),
     fontWeight: '500',
     marginLeft: scale(7),
+    color:ThemeColors.text1,
+    width: '75%',
+  },
+  codeApplied: {
+    fontSize: moderateScale(11),
+    fontWeight: '400',
+    marginLeft: scale(7),
+    width: '75%',
+    color:"gray"
   },
   confirmBtn: {
     backgroundColor: ThemeColors.primary,

@@ -6,6 +6,7 @@ import HomeScreen from '../screens/homeScreen/HomeScreen';
 import DropLocationSelector from '../screens/homeScreen/DropLocationSelector';
 import {TransitionPresets} from '@react-navigation/stack';
 import RideDetails from '../screens/homeScreen/RideDetails';
+import SelectOnMap from '../screens/homeScreen/SelectOnMap';
 
 const Stack = createStackNavigator();
 function AppStack() {
@@ -22,6 +23,7 @@ function AppStack() {
         }}
       />
       <Stack.Screen name='RideDetails' component={RideDetails}/>
+      <Stack.Screen name='SelectOnMap' component={SelectOnMap}/>
     </Stack.Navigator>
   );
 }

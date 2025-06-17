@@ -8,8 +8,8 @@ import Phonepe from '../../../assets/images/svg/phonepe.svg';
 import Paytm from '../../../assets/images/svg/paytm.svg';
 import Money from '../../../assets/images/svg/money.svg';
 import {moderateScale, scale, verticalScale} from 'react-native-size-matters';
-import { ScrollView } from 'react-native-gesture-handler';
-
+import {ScrollView} from 'react-native-gesture-handler';
+import {useEffect, useRef} from 'react';
 
 function PaymentModel({toggleCashModel, setPaymentMethod, paymentMethod}) {
   const imageSource = {
@@ -19,11 +19,15 @@ function PaymentModel({toggleCashModel, setPaymentMethod, paymentMethod}) {
     Paytm: <Paytm height={scale(25)} width={scale(25)} />,
     Cash: <Money height={scale(25)} width={scale(25)} />,
   };
+
+  
   const PaymentMethodUi = ({title, balance}) => {
     const isSelected = paymentMethod === title;
     const onPress = () => {
       setPaymentMethod(title);
+      toggleCashModel()
     };
+
     return (
       <TouchableOpacity
         style={[
@@ -60,42 +64,44 @@ function PaymentModel({toggleCashModel, setPaymentMethod, paymentMethod}) {
   };
 
   return (
-    <ScrollView contentContainerStyle={{flexGrow: 1}} showsVerticalScrollIndicator={false}>
-    <View style={styles.CMMainWrapper}>
-      <View style={styles.CMHeaderWrapper}>
-        <ArrowLeftIcon
-          color={ThemeColors.text1}
-          size={25}
-          strokeWidth={2}
-          onPress={toggleCashModel}
+    <ScrollView
+      contentContainerStyle={{flexGrow: 1}}
+      showsVerticalScrollIndicator={false}>
+      <View style={styles.CMMainWrapper}>
+        <View style={styles.CMHeaderWrapper}>
+          <ArrowLeftIcon
+            color={ThemeColors.text1}
+            size={25}
+            strokeWidth={2}
+            onPress={() => toggleCashModel()}
+          />
+          <Text style={styles.CMHeaderText}>Payments</Text>
+        </View>
+        <View style={styles.totalAmtWrapper}>
+          <Text style={styles.totalAmtTxt}>Total Amount:</Text>
+          <Text style={styles.totalAmtTxt}>₹25</Text>
+        </View>
+        <View style={styles.divider}></View>
+        <Text style={styles.PaymentMethod}>Wallets</Text>
+        <PaymentMethodUi
+          title={'BlueTaxi Wallet'}
+          balance={'Your Balance: ₹1500'}
         />
-        <Text style={styles.CMHeaderText}>Payments</Text>
-      </View>
-      <View style={styles.totalAmtWrapper}>
-        <Text style={styles.totalAmtTxt}>Total Amount:</Text>
-        <Text style={styles.totalAmtTxt}>₹25</Text>
-      </View>
-      <View style={styles.divider}></View>
-      <Text style={styles.PaymentMethod}>Wallets</Text>
-      <PaymentMethodUi
-        title={'BlueTaxi Wallet'}
-        balance={'Your Balance: ₹1500'}
-      />
-      <View style={styles.PaymentMethodWrapper}>
-        <Upi
-          height={scale(20)}
-          width={scale(35)}
-          style={{marginRight: scale(10)}}
-        />
+        <View style={styles.PaymentMethodWrapper}>
+          <Upi
+            height={scale(20)}
+            width={scale(35)}
+            style={{marginRight: scale(10)}}
+          />
 
-        <Text style={styles.PaymentMethod2}>Pay by UPI app</Text>
+          <Text style={styles.PaymentMethod2}>Pay by UPI app</Text>
+        </View>
+        <PaymentMethodUi title={'GPay'} />
+        <PaymentMethodUi title={'Phonepe'} />
+        <PaymentMethodUi title={'Paytm'} />
+        <Text style={styles.PaymentMethod}>Others</Text>
+        <PaymentMethodUi title={'Cash'} />
       </View>
-      <PaymentMethodUi title={'GPay'} />
-      <PaymentMethodUi title={'Phonepe'} />
-      <PaymentMethodUi title={'Paytm'} />
-      <Text style={styles.PaymentMethod}>Others</Text>
-      <PaymentMethodUi title={'Cash'} />
-    </View>
     </ScrollView>
   );
 }

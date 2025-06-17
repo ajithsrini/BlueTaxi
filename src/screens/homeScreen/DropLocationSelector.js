@@ -21,9 +21,8 @@ import {getAddressFromCoords} from '../../utils/MapUtils';
 
 function DropLocationSelector({navigation}) {
   const {pickupCon} = useContext(LocationContext);
-  // console.log('pickupcon', pickupCon);
 
-  const [pickup, setPickup] = useState(null);
+  const [pickupName, setPickupName] = useState(null);
   const [drop, setDrop] = useState(null);
   const [pickupSeachResult, SetPickupSeachResult] = useState([]);
   const [dropSeachResult, SetDropSeachResult] = useState([]);
@@ -86,6 +85,10 @@ function DropLocationSelector({navigation}) {
 
   }, [origin, destination]);
 
+  const navigateToSelectOnMap= ()=>{
+    navigation.navigate('SelectOnMap');
+  }
+
 
   return (
     <SafeAreaView style={style.safeArea}>
@@ -125,9 +128,9 @@ function DropLocationSelector({navigation}) {
                   ? SetPickupSeachResult
                   : SetDropSeachResult
               }
-              value={pickup}
+              value={pickupName}
               setter={text => {
-                setPickup(text);
+                setPickupName(text);
                 setPickupEdited(true);
                 setPickupSelectedFromList(false);
               }}
@@ -164,7 +167,7 @@ function DropLocationSelector({navigation}) {
         </View>
       </View>
 
-      <TouchableOpacity style={style.selectMapWapper}>
+      <TouchableOpacity style={style.selectMapWapper} onPress={navigateToSelectOnMap}>
         <MapIcon color={'gray'} size={scale(15)} />
         <Text style={style.selectMapText}>Select on map</Text>
       </TouchableOpacity>
@@ -181,7 +184,7 @@ function DropLocationSelector({navigation}) {
               locationSetter={
                 activeInput === 'pickup' ? setOrigin : setDestination
               }
-              inputSetter={activeInput === 'pickup' ? setPickup : setDrop}
+              inputSetter={activeInput === 'pickup' ? setPickupName : setDrop}
               searchData={
                 activeInput === 'pickup'
                   ? SetPickupSeachResult
@@ -249,19 +252,19 @@ const style = StyleSheet.create({
   selectMapWapper: {
     flexDirection: 'row',
     borderRadius: scale(15),
-    borderWidth: 1,
+    borderWidth: 0.5,
     borderColor: 'gray',
     alignSelf: 'flex-start',
     alignItems: 'center',
-    paddingVertical: verticalScale(3),
+    paddingVertical: verticalScale(4),
     paddingHorizontal: scale(7),
     marginTop: verticalScale(15),
     marginLeft: scale(10),
   },
   selectMapText: {
-    color: 'gray',
+    color: ThemeColors.text1,
     fontSize: moderateScale(12),
-    fontWeight: '500',
+    fontWeight: '400',
     marginLeft: scale(5),
   },
   divider: {
