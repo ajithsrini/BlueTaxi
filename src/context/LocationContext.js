@@ -1,15 +1,25 @@
-import { createContext, useState } from "react";
+import {createContext, useState} from 'react';
 
-export const LocationContext = createContext()
+export const LocationContext = createContext();
 
 const LocationProvider = ({children}) => {
-    const [pickupCon,setPickupCon] = useState()
-    const [dropCon,setDropCon] = useState()
-    return (
-        <LocationContext.Provider value={{pickupCon,dropCon,setPickupCon,setDropCon}}>
-            {children}
-        </LocationContext.Provider>
-    )
-}
+  const [pickupCon, setPickupCon] = useState();
+  const [pickupEdited, setPickupEdited] = useState(false);
+  const [pickupSelectedFromList, setPickupSelectedFromList] = useState(false);
 
-export default LocationProvider
+  return (
+    <LocationContext.Provider
+      value={{
+        pickupCon,
+        setPickupCon,
+        pickupEdited,
+        setPickupEdited,
+        pickupSelectedFromList,
+        setPickupSelectedFromList,
+      }}>
+      {children}
+    </LocationContext.Provider>
+  );
+};
+
+export default LocationProvider;

@@ -10,3 +10,17 @@ export const carData = [
   { carType: 'SUV', distance: '2.5 km', price: 'Rs. 700', arriveTime: '7 mins',passengerCount:"3" },
   { carType: 'Luxury', distance: '0.9 km', price: 'Rs. 1200', arriveTime: '4 mins',passengerCount:"4" }
 ];
+
+export const savedPlaces = [
+  { name: "Home", address: "12, Anna Nagar, Avinashi Road, Tirupur, Tamil Nadu" },
+  { name: "Office", address: "Plot 42, Kumaran Nagar, Mangalam Road, Tirupur" },
+  { name: "Market", address: "No7, RSG Complex, Kamarajar Street, Shanmugapuram, Puducherry" },
+  { name: "Friend's House", address: "5/112, Gandhi Nagar, Palladam, Tirupur" },
+  { name: "Textile Park", address: "SIDCO Industrial Estate, Mudalipalayam, Tirupur" },
+  { name: "Mall", address: "Tirupur Grand Mall, Kangeyam Road, Tirupur" },
+  { name: "Hospital", address: "KMCH Hospital, College Road, Tirupur" },
+  { name: "Railway Station", address: "Tirupur Railway Station, Railway Station Road, Tirupur" },
+  { name: "Airport", address: "Coimbatore International Airport, Avinashi Road, Coimbatore" },
+  { name: "Temple", address: "Avinashi Lingeshwarar Temple, Avinashi, Tirupur District" }
+];
+

@@ -10,12 +10,25 @@ import {moderateScale, scale, verticalScale} from 'react-native-size-matters';
 import CustomButton from '../../components/CustomButton';
 import {ArrowLeftIcon} from 'react-native-heroicons/outline';
 import CurrentLocation from '../../assets/images/svg/currentLocation.svg';
-import {useCallback, useEffect, useRef, useState} from 'react';
+import {useCallback, useContext, useEffect, useRef, useState} from 'react';
 import MapView, {Marker, PROVIDER_GOOGLE} from 'react-native-maps';
 import {getAddressFromCoords, parseAddress} from '../../utils/MapUtils';
 import PickUpIcon from '../../assets/images/svg/pickUpIcon.svg';
+import DropIcon from '../../assets/images/svg/dropIcon.svg';
+import {useDispatch} from 'react-redux';
+import {
+  setDestination,
+  setDropName,
+  setOrigin,
+  setPickupName,
+} from '../../slices/PickDropSlice';
+import { LocationContext } from '../../context/LocationContext';
 
-function SelectOnMap({navigation}) {
+function SelectOnMap({navigation, route}) {
+  const dispatch = useDispatch();
+  const {activeInput} = route.params;
+  const {setPickupEdited, setPickupSelectedFromList} = useContext(LocationContext);
+
   const goBack = useCallback(() => {
     navigation.goBack();
   });
@@ -40,22 +53,57 @@ function SelectOnMap({navigation}) {
     regionRef.current = region;
   }, [region]);
 
-const onRegionChangeComplete = async (trackRegion) => {
-  if (
-    Math.abs(trackRegion.latitude - regionRef.current.latitude) > 0.0001 ||
-    Math.abs(trackRegion.longitude - regionRef.current.longitude) > 0.0001
-  ) {
-    // Only update if significant change
-    const response = await getAddressFromCoords(
-      trackRegion.latitude,
-      trackRegion.longitude
-    );
-    const modifiedAddress = parseAddress(response)
-    console.log("modifiedAddress", modifiedAddress)
-    setLocationDetails(modifiedAddress);
-    setRegion(trackRegion);
-  }
-};
+  const onRegionChangeComplete = async trackRegion => {
+    if (
+      Math.abs(trackRegion.latitude - regionRef.current.latitude) > 0.0001 ||
+      Math.abs(trackRegion.longitude - regionRef.current.longitude) > 0.0001
+    ) {
+      const response = await getAddressFromCoords(
+        trackRegion.latitude,
+        trackRegion.longitude,
+      );
+      const modifiedAddress = parseAddress(response);
+      console.log('modifiedAddress', modifiedAddress);
+      // setLocationDetails(modifiedAddress);
+      setLocationDetails({
+        street: modifiedAddress.street,
+        area: modifiedAddress.area,
+        latitude: trackRegion.latitude,
+        longitude: trackRegion.longitude,
+      });
+      setRegion(trackRegion);
+    }
+  };
+
+  const updateLocation = () => {
+    if (activeInput === 'pickup') {
+      dispatch(
+        setOrigin({
+          latitude: region.latitude,
+          longitude: region.longitude,
+          name: locationDetails.street,
+          time: Date.now(),
+        }),
+      );
+      dispatch(setPickupName(locationDetails.street));
+      navigation.goBack();
+      setPickupEdited(false)
+       setPickupSelectedFromList(true)
+    } else {
+      dispatch(
+        setDestination({
+          latitude: region.latitude,
+          longitude: region.longitude,
+          name: locationDetails.street,
+          time: Date.now(),
+        }),
+      );
+      dispatch(setDropName(locationDetails.street));
+      navigation.goBack();
+      setPickupEdited(false)
+       setPickupSelectedFromList(true)
+    }
+  };
 
   return (
     <View style={style.mainWrapper}>
@@ -72,8 +120,7 @@ const onRegionChangeComplete = async (trackRegion) => {
           provider={PROVIDER_GOOGLE}
           showsUserLocation={true}
           showsMyLocationButton={true}
-          followsUserLocation={true}
-          >
+          followsUserLocation={true}>
           {/* <Marker coordinate={region}>
             <View
               style={{
@@ -86,7 +133,11 @@ const onRegionChangeComplete = async (trackRegion) => {
           </Marker> */}
         </MapView>
         <View style={style.centerPinWrapper}>
-          <PickUpIcon height={moderateScale(30)} width={moderateScale(30)} />
+          {activeInput == 'pickup' ? (
+            <PickUpIcon height={moderateScale(30)} width={moderateScale(30)} />
+          ) : (
+            <DropIcon height={moderateScale(30)} width={moderateScale(30)} />
+          )}
         </View>
       </View>
 
@@ -113,12 +164,18 @@ const onRegionChangeComplete = async (trackRegion) => {
 
         <View style={style.locationCardWrapper}>
           <View style={style.pinLogoWrapper}>
-            <PickUpIcon height={moderateScale(25)} width={moderateScale(25)} />
+            {activeInput == 'pickup' ? (
+              <PickUpIcon
+                height={moderateScale(25)}
+                width={moderateScale(25)}
+              />
+            ) : (
+              <DropIcon height={moderateScale(25)} width={moderateScale(25)} />
+            )}
           </View>
           <View style={style.locationDetailWrapper}>
             <Text style={style.locationName}>
-              {(locationDetails && locationDetails.street) ||
-                'Pick from map'}
+              {(locationDetails && locationDetails.street) || 'Drag to choose location'}
             </Text>
             {locationDetails && (
               <Text style={style.locationAddrres} numberOfLines={1}>
@@ -128,7 +185,18 @@ const onRegionChangeComplete = async (trackRegion) => {
           </View>
         </View>
 
-        <CustomButton lable={'Select Pickup'} marginT={verticalScale(25)} />
+        <CustomButton
+          lable={activeInput == 'pickup' ? 'Select Pickup' : 'Select Drop'}
+          marginT={verticalScale(25)}
+          onPress={updateLocation}
+          disabled={
+            locationDetails &&
+            locationDetails.latitude &&
+            locationDetails.longitude
+              ? false
+              : true
+          }
+        />
       </View>
     </View>
   );

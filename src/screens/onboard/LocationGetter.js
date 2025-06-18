@@ -16,7 +16,7 @@ import {PermissionsAndroid, Platform} from 'react-native';
 import {useState} from 'react';
 import {MapPinIcon} from 'react-native-heroicons/outline';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { requestLocationPermission } from '../../utils/MapUtils';
+import {requestLocationPermission} from '../../utils/MapUtils';
 
 function LocationGetter({navigation}) {
   const [locationFetch, setLocationFetch] = useState(false);
@@ -41,14 +41,12 @@ function LocationGetter({navigation}) {
   // };
 
   const handleLocationCheck = async () => {
-   
-      const requested = await requestLocationPermission();
-      console.log('permission status', requested);
-      if (requested) {
-        navigation.replace("Authentication")
-        return;
-      }
-    
+    const requested = await requestLocationPermission();
+    console.log('permission status', requested);
+    if (requested) {
+      navigation.replace('Authentication');
+      return;
+    }
 
     // const gpsEnabled = await checkGPS();
     // if (!gpsEnabled) {

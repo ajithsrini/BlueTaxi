@@ -1,9 +1,7 @@
 import {
-  ActivityIndicator,
   Alert,
-  Dimensions,
-  PermissionsAndroid,
-  Platform,
+  FlatList,
+  Image,
   StatusBar,
   StyleSheet,
   Text,
@@ -14,17 +12,16 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import {ThemeColors} from '../../constant/Colors';
 import {useCallback, useContext, useEffect, useState} from 'react';
 import Geolocation from 'react-native-geolocation-service';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Bars3Icon, MagnifyingGlassIcon} from 'react-native-heroicons/outline';
-import {MapPinIcon} from 'react-native-heroicons/solid';
 import {moderateScale, scale, verticalScale} from 'react-native-size-matters';
-import MapView, {Marker, PROVIDER_GOOGLE} from 'react-native-maps';
 import {requestLocationPermission} from '../../utils/MapUtils';
-import { LocationContext } from '../../context/LocationContext';
+import {LocationContext} from '../../context/LocationContext';
+import SavedLocationCard from './components/SavedLocationCard';
+import HomeImage from '../../assets/images/svg/homeImage.svg';
+import { savedPlaces } from '../../constant/VehicleData';
 
 function HomeScreen({navigation}) {
-
-  const {setPickupCon} = useContext(LocationContext)
+  const {setPickupCon} = useContext(LocationContext);
   const checkGPS = () => {
     return new Promise((resolve, reject) => {
       Geolocation.getCurrentPosition(
@@ -63,25 +60,13 @@ function HomeScreen({navigation}) {
       if (gpsEnabled) {
         Geolocation.getCurrentPosition(
           async position => {
-            try {
-              setCurrentLocation({
-                latitude: position.coords.latitude,
-                longitude: position.coords.longitude,
-              });
-              
-              await AsyncStorage.setItem(
-                'latitude',
-                position.coords.latitude.toString(),
-              );
-              await AsyncStorage.setItem(
-                'longitude',
-                position.coords.longitude.toString(),
-              );
-              console.log('latitude Home:', position.coords.latitude);
-              console.log('Longitude Home:', position.coords.longitude);
-            } catch (e) {
-              console.error('AsyncStorage error:', e);
-            }
+            setCurrentLocation({
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+            });
+
+            console.log('latitude Home:', position.coords.latitude);
+            console.log('Longitude Home:', position.coords.longitude);
           },
 
           error => {
@@ -103,12 +88,11 @@ function HomeScreen({navigation}) {
   useEffect(() => {
     handleLocationCheck();
   }, []);
-  
 
   const navigateToDropLocation = useCallback(() => {
     navigation.navigate('DropLocationSelector');
-    setPickupCon(currentLocation)
-  }, [navigation,currentLocation]);
+    setPickupCon(currentLocation);
+  }, [navigation, currentLocation]);
 
   return (
     <SafeAreaView style={style.safeArea}>
@@ -124,8 +108,8 @@ function HomeScreen({navigation}) {
           <Text style={style.searchText}>Where are you going?</Text>
         </TouchableOpacity>
       </View>
-      <View style={{flex: 1}}>
-        {gpsStatus ? (
+      <View style={{flex: 1, backgroundColor: ThemeColors.secondary}}>
+        {/* {gpsStatus ? (
           <>
             {currentLocation ? (
               <MapView
@@ -152,7 +136,23 @@ function HomeScreen({navigation}) {
               Please enable GPS to use this feature.
             </Text>
           </View>
-        )}
+        )} */}
+
+        <FlatList 
+          data={savedPlaces.slice(0,5)}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({item}) => <SavedLocationCard item={item} />}
+        />
+        <Image
+          source={require('../../assets/images/png/homeImage.png')}
+          style={{
+            width: '100%',
+            position: 'absolute',
+            bottom: 0,
+            resizeMode: 'cover',
+            zIndex:10
+          }}
+        />
       </View>
     </SafeAreaView>
   );

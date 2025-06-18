@@ -20,7 +20,7 @@ function CustomButton({
           marginTop: marginT,
           marginBottom: marginB,
           width: width,
-          backgroundColor: bgColor,
+          backgroundColor: disabled ? 'lightgray' : bgColor,
         },
       ]}
       onPress={onPress}

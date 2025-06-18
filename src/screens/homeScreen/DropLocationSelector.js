@@ -4,7 +4,7 @@ import {
   StatusBar,
   StyleSheet,
   Text,
-  TextInput,
+  ToastAndroid,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -18,19 +18,37 @@ import PlaceSeachTextInput from './components/PlaceSeachTextInput';
 import PlacelistCard from './components/PlaceListCard';
 import {LocationContext} from '../../context/LocationContext';
 import {getAddressFromCoords} from '../../utils/MapUtils';
-
+import {useSelector} from 'react-redux';
+import {useDispatch} from 'react-redux';
+import {
+  setPickupName,
+  setDropName,
+  setOrigin,
+  resetCoordinates,
+  resetNames,
+} from '../../slices/PickDropSlice';
 function DropLocationSelector({navigation}) {
-  const {pickupCon} = useContext(LocationContext);
+  const {
+    pickupCon,
+    pickupEdited,
+    setPickupEdited,
+    pickupSelectedFromList,
+    setPickupSelectedFromList,
+  } = useContext(LocationContext);
+  console.log('pickup con', pickupCon);
 
-  const [pickupName, setPickupName] = useState(null);
-  const [drop, setDrop] = useState(null);
+  const dispatch = useDispatch();
+
+  const {pickupName, dropName, origin, destination} = useSelector(
+    state => state.PickDrop,
+  );
+
   const [pickupSeachResult, SetPickupSeachResult] = useState([]);
   const [dropSeachResult, SetDropSeachResult] = useState([]);
+
   const [activeInput, setActiveInput] = useState(null);
-  const [origin, setOrigin] = useState(null);
-  const [destination, setDestination] = useState(null);
-  const [pickupEdited, setPickupEdited] = useState(false);
-  const [pickupSelectedFromList, setPickupSelectedFromList] = useState(false);
+  // const [pickupEdited, setPickupEdited] = useState(false);
+  // const [pickupSelectedFromList, setPickupSelectedFromList] = useState(false);
 
   const backNavigation = useCallback(() => {
     navigation.goBack();
@@ -39,14 +57,21 @@ function DropLocationSelector({navigation}) {
   useEffect(() => {
     const setPickupFromCurret = async () => {
       if (pickupCon?.latitude && pickupCon?.longitude) {
-        const response = await getAddressFromCoords(pickupCon.latitude, pickupCon.longitude);
-        setOrigin({
-          "latitude": pickupCon.latitude,
-          "longitude": pickupCon.longitude,
-          "name": response,
-           "time": Date.now(),
-        });
-        setPickup('Your current location');
+        const response = await getAddressFromCoords(
+          pickupCon.latitude,
+          pickupCon.longitude,
+        );
+        console.log('address getted', response);
+        dispatch(
+          setOrigin({
+            latitude: pickupCon.latitude,
+            longitude: pickupCon.longitude,
+            name: response,
+            time: Date.now(),
+          }),
+        );
+        dispatch(setPickupName('Your current location'));
+        console.log('your curret location setting ');
       }
     };
     setPickupFromCurret();
@@ -54,8 +79,8 @@ function DropLocationSelector({navigation}) {
 
   useEffect(() => {
     if (activeInput === 'drop' && pickupEdited && !pickupSelectedFromList) {
-      setPickup('Your current location');
-      setOrigin(pickupCon);
+      dispatch(setPickupName('Your current location'));
+      dispatch(setOrigin(pickupCon));
     }
   }, [activeInput]);
 
@@ -64,8 +89,8 @@ function DropLocationSelector({navigation}) {
     setPickupSelectedFromList(true);
     setPickupEdited(false);
   };
-  useEffect(() => {
-    
+
+  const navigateToRideDetail = () => {
     if (
       origin?.latitude &&
       origin?.longitude &&
@@ -74,21 +99,25 @@ function DropLocationSelector({navigation}) {
       destination?.longitude &&
       destination?.name
     ) {
-      
-      navigation.navigate('RideDetails', {
+      navigation.replace('RideDetails', {
         pickupLocation: origin,
         dropLocation: destination,
       });
+      dispatch(resetCoordinates());
+      dispatch(resetNames());
       // console.log('Navigating to RideDetails', origin, destination);
-      console.log("destination tiem",destination.time)
+      console.log('destination item', destination.time);
+    } else {
+      ToastAndroid.show('Please select your drop location', ToastAndroid.SHORT);
     }
+  };
 
-  }, [origin, destination]);
-
-  const navigateToSelectOnMap= ()=>{
-    navigation.navigate('SelectOnMap');
-  }
-
+  const navigateToSelectOnMap = () => {
+    navigation.navigate('SelectOnMap', {activeInput: activeInput});
+    activeInput === 'pickup'
+      ? SetPickupSeachResult([])
+      : SetDropSeachResult([]);
+  };
 
   return (
     <SafeAreaView style={style.safeArea}>
@@ -100,6 +129,24 @@ function DropLocationSelector({navigation}) {
           onPress={backNavigation}
         />
         <Text style={style.title}>Drop</Text>
+        <Text
+          style={[
+            style.continue,
+            {
+              color:
+                origin?.latitude &&
+                origin?.longitude &&
+                origin?.name &&
+                destination?.latitude &&
+                destination?.longitude &&
+                destination?.name
+                  ? ThemeColors.primary
+                  : 'lightgray',
+            },
+          ]}
+          onPress={navigateToRideDetail}>
+          Continue
+        </Text>
       </View>
       <View style={style.lcPickerMainWrapper}>
         {pickupCon?.latitude == null ? (
@@ -130,7 +177,7 @@ function DropLocationSelector({navigation}) {
               }
               value={pickupName}
               setter={text => {
-                setPickupName(text);
+                dispatch(setPickupName(text));
                 setPickupEdited(true);
                 setPickupSelectedFromList(false);
               }}
@@ -158,8 +205,8 @@ function DropLocationSelector({navigation}) {
                   ? SetPickupSeachResult
                   : SetDropSeachResult
               }
-              value={drop}
-              setter={text => setDrop(text)}
+              value={dropName}
+              setter={text => dispatch(setDropName(text))}
               userCurrentLocation={pickupCon}
               onFocus={() => setActiveInput('drop')}
             />
@@ -167,7 +214,9 @@ function DropLocationSelector({navigation}) {
         </View>
       </View>
 
-      <TouchableOpacity style={style.selectMapWapper} onPress={navigateToSelectOnMap}>
+      <TouchableOpacity
+        style={style.selectMapWapper}
+        onPress={navigateToSelectOnMap}>
         <MapIcon color={'gray'} size={scale(15)} />
         <Text style={style.selectMapText}>Select on map</Text>
       </TouchableOpacity>
@@ -181,22 +230,18 @@ function DropLocationSelector({navigation}) {
           renderItem={({item}) => (
             <PlacelistCard
               data={item}
-              locationSetter={
-                activeInput === 'pickup' ? setOrigin : setDestination
-              }
-              inputSetter={activeInput === 'pickup' ? setPickupName : setDrop}
               searchData={
                 activeInput === 'pickup'
                   ? SetPickupSeachResult
                   : SetDropSeachResult
               }
+              activeInput={activeInput}
               pickupDetector={pickEditDetector}
             />
           )}
           showsVerticalScrollIndicator={false}
         />
       </TouchableOpacity>
-
     </SafeAreaView>
   );
 }
@@ -212,11 +257,19 @@ const style = StyleSheet.create({
     alignItems: 'center',
     marginVertical: verticalScale(10),
     marginTop: verticalScale(15),
+    alignItems: 'center',
   },
   title: {
     fontSize: moderateScale(18),
     fontWeight: '700',
     marginLeft: scale(10),
+    color: ThemeColors.text1,
+  },
+  continue: {
+    fontSize: moderateScale(15),
+    fontWeight: '500',
+    position: 'absolute',
+    right: scale(10),
   },
   lcPickerMainWrapper: {
     width: '95%',
@@ -225,6 +278,7 @@ const style = StyleSheet.create({
     borderRadius: scale(15),
     backgroundColor: '#faf2ca',
     marginTop: verticalScale(10),
+    
   },
   warningWrapper: {
     borderTopRightRadius: scale(15),
@@ -260,6 +314,7 @@ const style = StyleSheet.create({
     paddingHorizontal: scale(7),
     marginTop: verticalScale(15),
     marginLeft: scale(10),
+    backgroundColor:"#eaeaeaff"
   },
   selectMapText: {
     color: ThemeColors.text1,

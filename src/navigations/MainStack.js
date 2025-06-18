@@ -1,23 +1,28 @@
-import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
+import {NavigationContainer} from '@react-navigation/native';
+import {createStackNavigator} from '@react-navigation/stack';
+import {Provider} from 'react-redux';
+import AuthStack from './AuthStack';
+import AppStack from './AppStack';
+import LocationProvider from '../context/LocationContext';
+import Store from '../store/Store';
 
-import AuthStack from "./AuthStack";
-import AppStack from "./AppStack";
-import LocationProvider from "../context/LocationContext";
+const Stack = createStackNavigator();
 
-const Stack = createStackNavigator()
-
-function MainStack (){
-    return(
-        <LocationProvider>
-        <NavigationContainer>
-        <Stack.Navigator screenOptions={{headerShown: false}} initialRouteName="AppStack" >
-            <Stack.Screen name="AuthStack" component={AuthStack} />
-            <Stack.Screen name="AppStack" component={AppStack} />
-            </Stack.Navigator>
-        </NavigationContainer>
-        </LocationProvider>
-    )
+function MainStack() {
+  return (
+    <Provider store={Store}>
+    <LocationProvider>
+      <NavigationContainer>
+        <Stack.Navigator
+          screenOptions={{headerShown: false}}
+          initialRouteName="AppStack">
+          <Stack.Screen name="AuthStack" component={AuthStack} />
+          <Stack.Screen name="AppStack" component={AppStack} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </LocationProvider>
+    </Provider>
+  );
 }
 
-export default MainStack
+export default MainStack;
