@@ -142,6 +142,7 @@ function HomeScreen({navigation}) {
           data={savedPlaces.slice(0,5)}
           keyExtractor={(item, index) => index.toString()}
           renderItem={({item}) => <SavedLocationCard item={item} />}
+          showsVerticalScrollIndicator={false}
         />
         <Image
           source={require('../../assets/images/png/homeImage.png')}

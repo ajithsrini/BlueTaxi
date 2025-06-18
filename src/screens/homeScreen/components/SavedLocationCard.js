@@ -9,14 +9,14 @@ function SavedLocationCard ({item}){
     return(
         <View style={style.mainWrapper}>
         <View style={style.imageWrapper}>
-            <HeartIcon size={scale(20)} color={"gray"} />
+            <HeartIcon size={scale(18)} color={"gray"} />
         </View>
         <View style={style.detailWrapper}>
             <Text style={style.name} numberOfLines={1}>{item.name}</Text>
             <Text style={style.address} numberOfLines={1}>{item.address}</Text>
         </View>
         <View style={style.imageWrapper}>
-            <PastTime height={scale(17)} width={scale(17)}/>
+            <PastTime height={scale(15)} width={scale(15)}/>
         </View>
 
         </View>
@@ -29,7 +29,7 @@ export default SavedLocationCard
 
 const style = StyleSheet.create({
     mainWrapper:{
-        // backgroundColor:ThemeColors.lightGray,
+        backgroundColor:ThemeColors.lightGray,
         flexDirection:"row"
     },
     imageWrapper:{

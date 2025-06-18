@@ -166,7 +166,7 @@ function DropLocationSelector({navigation}) {
               alignItems: 'center',
               paddingLeft: scale(5),
             }}>
-            <MapPinIcon color={'green'} style={{opacity: 0.7}} />
+            <MapPinIcon color={'green'} style={{opacity: 0.8}} />
 
             <PlaceSeachTextInput
               placeholder={'Pickup location'}
@@ -197,7 +197,7 @@ function DropLocationSelector({navigation}) {
               paddingTop: 2,
               paddingLeft: scale(5),
             }}>
-            <MapPinIcon color={'red'} style={{opacity: 0.7}} />
+            <MapPinIcon color={'red'} style={{opacity: 0.8}} />
             <PlaceSeachTextInput
               placeholder={'Drop location'}
               searchResult={
