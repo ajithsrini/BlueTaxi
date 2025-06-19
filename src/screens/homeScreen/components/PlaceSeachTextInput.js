@@ -3,6 +3,9 @@ import {ThemeColors} from '../../../constant/Colors';
 import {GOOGLE_MAPS_APIKEY} from '../../../utils/MapUtils';
 import {moderateScale, scale} from 'react-native-size-matters';
 
+const INITIAL_LAT = 11.9386981;
+const INITIAL_LNG = 79.8320056;
+
 function PlaceSeachTextInput({
   placeholder,
   searchResult,
@@ -10,30 +13,26 @@ function PlaceSeachTextInput({
   setter,
   userCurrentLocation,
   onFocus,
-  onBlur
+  onBlur,
 }) {
   const apiKey = GOOGLE_MAPS_APIKEY;
-  
+  const lat = userCurrentLocation?.latitude || INITIAL_LAT;
+  const lng = userCurrentLocation?.longitude || INITIAL_LNG;
+  const radius = 6000;
   const googleApisUrl =
     'https://maps.googleapis.com/maps/api/place/textsearch/json';
 
-  const INITIAL_LAT = 11.9386981;
-  const INITIAL_LNG = 79.8320056;
-
   const searchPlaces = async query => {
     if (!query.trim()) {
-        searchResult([])
-        return
-    };
+      searchResult([]);
+      return;
+    }
 
     const input = encodeURIComponent(query.trim());
 
-    const lat = userCurrentLocation?.latitude || INITIAL_LAT;
-    const lng = userCurrentLocation?.longitude || INITIAL_LNG;
-    const radius = 4000;
     // console.log(userCurrentLocation)
 
-    const url = `${googleApisUrl}?query=${input}&location=${lat},${lng}&radius=${radius}&key=${apiKey}`;
+    const url = `${googleApisUrl}?query=${input}&location=${lat},${lng}&radius=${radius}&key=${apiKey}&components=country:in`;
 
     try {
       const resp = await fetch(url);
@@ -49,8 +48,7 @@ function PlaceSeachTextInput({
   };
 
   return (
-    <View 
-    style={{flex:1}}>
+    <View style={{flex: 1}}>
       <TextInput
         placeholder={placeholder || 'Enter text'}
         style={style.textInput}

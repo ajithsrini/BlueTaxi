@@ -133,7 +133,7 @@ const RideDetails = ({route}) => {
             latitudeDelta: 0.005,
             longitudeDelta: 0.005,
           }}>
-          <Marker coordinate={origin}>
+          <Marker coordinate={origin} >
             <View style={styles.markerWrapper}>
               <View style={styles.markertextWrapper}>
                 <Text style={styles.markerText} numberOfLines={1}>
@@ -143,7 +143,7 @@ const RideDetails = ({route}) => {
               <MapPinIcon color={'green'} />
             </View>
           </Marker>
-          <Marker coordinate={destination}>
+          <Marker coordinate={destination} >
             <View style={styles.markerWrapper}>
               <View style={styles.markertextWrapper}>
                 <Text style={styles.markerText} numberOfLines={1}>
@@ -309,7 +309,7 @@ const styles = StyleSheet.create({
   },
   confirmBtn: {
     backgroundColor: ThemeColors.primary,
-    borderRadius: scale(50),
+    borderRadius: scale(10),
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: verticalScale(20),
@@ -338,12 +338,13 @@ const styles = StyleSheet.create({
   markerWrapper: {
     justifyContent: 'center',
     alignItems: 'center',
+    
   },
   markertextWrapper: {
     backgroundColor: 'white',
     borderRadius: 7,
     elevation: 10,
-    maxWidth: scale(150),
+    maxWidth: scale(120),
   },
   markerText: {
     marginHorizontal: scale(8),

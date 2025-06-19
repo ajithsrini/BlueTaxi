@@ -16,84 +16,20 @@ import {PermissionsAndroid, Platform} from 'react-native';
 import {useState} from 'react';
 import {MapPinIcon} from 'react-native-heroicons/outline';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {requestLocationPermission} from '../../utils/MapUtils';
+import {handleGpsCheck, requestLocationPermission} from '../../utils/MapUtils';
 
 function LocationGetter({navigation}) {
-  const [locationFetch, setLocationFetch] = useState(false);
-
-  // const checkGPS = () => {
-  //   return new Promise((resolve, reject) => {
-  //     Geolocation.getCurrentPosition(
-  //       position => resolve(true),
-  //       error => {
-  //         if (error.code === 2) resolve(false);
-  //         else reject(error);
-  //       },
-  //       {
-  //         enableHighAccuracy: true,
-  //         timeout: 10000,
-  //         forceRequestLocation: true,
-  //         forceLocationManager: true,
-  //         showLocationDialog: true,
-  //       },
-  //     );
-  //   });
-  // };
+ 
 
   const handleLocationCheck = async () => {
-    const requested = await requestLocationPermission();
-    console.log('permission status', requested);
-    if (requested) {
-      navigation.replace('Authentication');
-      return;
-    }
+    const permission = await requestLocationPermission();
+    console.log('permission status', permission);
+    if (permission) {
+          const gpsEnabled = await handleGpsCheck();
+          console.log('gps enabled or not in home:', gpsEnabled);
+          navigation.navigate("Authentication")
+        }
 
-    // const gpsEnabled = await checkGPS();
-    // if (!gpsEnabled) {
-    //   Alert.alert('GPS is Off', 'Please enable GPS to use this feature.', [
-    //     {text: 'Open Settings', onPress: () => Linking.openSettings()},
-    //     {text: 'Cancel', style: 'cancel'},
-    //   ]);
-    //   return;
-    // }
-
-    // if (gpsEnabled) {
-    //   setLocationFetch(true);
-    //   Geolocation.getCurrentPosition(
-    //     async position => {
-    //       try {
-    //         await AsyncStorage.setItem(
-    //           'latitude',
-    //           position.coords.latitude.toString(),
-    //         );
-    //         await AsyncStorage.setItem(
-    //           'longitude',
-    //           position.coords.longitude.toString(),
-    //         );
-    //         console.log('latitude:', position.coords.latitude);
-    //         console.log('Longitude:', position.coords.longitude);
-    //         setLocationFetch(false);
-    //         navigation.navigate('Authentication');
-    //       } catch (e) {
-    //         console.error('AsyncStorage error:', e);
-    //         setLocationFetch(false);
-    //       }
-    //     },
-
-    //     error => {
-    //       console.error('Error getting location:', error);
-    //       setLocationFetch(false);
-    //     },
-    //     {
-    //       enableHighAccuracy: true,
-    //       timeout: 15000,
-    //       maximumAge: 10000,
-    //       forceRequestLocation: true,
-    //       forceLocationManager: true,
-    //       showLocationDialog: true,
-    //     },
-    //   );
-    // }
   };
 
   return (
@@ -105,23 +41,13 @@ function LocationGetter({navigation}) {
         <Text style={style.primaryText}>Hi, nice to meet you!</Text>
         <Text style={style.secondaryText}>{`Choose your location to start find
 restaurants around you.`}</Text>
-        {!locationFetch ? (
+       
           <TouchableOpacity
             style={style.btnWrapper}
             onPress={handleLocationCheck}>
             <MapPinIcon color={ThemeColors.secondary} />
             <Text style={style.btnText}>Enable location access</Text>
           </TouchableOpacity>
-        ) : (
-          <TouchableOpacity
-            style={style.btnWrapper}
-            onPress={handleLocationCheck}>
-            <ActivityIndicator color={ThemeColors.secondary} size={'small'} />
-          </TouchableOpacity>
-        )}
-        {/* <TouchableOpacity style={style.btnWrapper2}>
-          <Text style={style.btnText2}>Enter pickup manually</Text>
-        </TouchableOpacity> */}
       </View>
     </SafeAreaView>
   );

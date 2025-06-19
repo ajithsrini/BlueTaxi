@@ -7,6 +7,7 @@ import OtpInput from '../../components/OtpInput';
 import { useCallback, useState } from 'react';
 import CustomButton from '../../components/CustomButton';
 
+
 function OtpVerify({navigation}) {
     const[otp,setOtp] = useState("")
     const navigateGoBack =useCallback(() => {

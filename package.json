@@ -12,6 +12,8 @@
   "dependencies": {
     "@mapbox/polyline": "^1.2.1",
     "@react-native-async-storage/async-storage": "^2.2.0",
+    "@react-native-masked-view/masked-view": "^0.3.2",
+    "@react-navigation/drawer": "^7.4.3",
     "@react-navigation/native": "^7.1.10",
     "@react-navigation/stack": "^7.3.3",
     "@reduxjs/toolkit": "^2.8.2",
@@ -19,6 +21,7 @@
     "formik": "^2.4.6",
     "react": "19.0.0",
     "react-native": "0.79.3",
+    "react-native-android-location-enabler": "^2.0.1",
     "react-native-geolocation-service": "^5.3.1",
     "react-native-gesture-handler": "^2.25.0",
     "react-native-google-places-autocomplete": "^2.5.7",

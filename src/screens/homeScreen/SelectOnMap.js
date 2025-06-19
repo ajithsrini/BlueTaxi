@@ -24,6 +24,12 @@ import {
 } from '../../slices/PickDropSlice';
 import { LocationContext } from '../../context/LocationContext';
 
+
+  const currentLocation = {
+    latitude: 11.9386981,
+    longitude: 79.8320056,
+  };
+
 function SelectOnMap({navigation, route}) {
   const dispatch = useDispatch();
   const {activeInput} = route.params;
@@ -32,11 +38,6 @@ function SelectOnMap({navigation, route}) {
   const goBack = useCallback(() => {
     navigation.goBack();
   });
-
-  const currentLocation = {
-    latitude: 11.9386981,
-    longitude: 79.8320056,
-  };
 
   const [region, setRegion] = useState({
     latitude: currentLocation.latitude,
@@ -48,23 +49,26 @@ function SelectOnMap({navigation, route}) {
   const [locationDetails, setLocationDetails] = useState();
 
   const regionRef = useRef(region);
+  const [enableUserLocation,setEnableUserLocation] = useState(false)
+  useEffect(()=>{
+    if(!enableUserLocation){
+      setTimeout(() => {
+        setEnableUserLocation(true)
+      }, 500);
+    }
+  },[])
 
   useEffect(() => {
     regionRef.current = region;
   }, [region]);
 
   const onRegionChangeComplete = async trackRegion => {
-    if (
-      Math.abs(trackRegion.latitude - regionRef.current.latitude) > 0.0001 ||
-      Math.abs(trackRegion.longitude - regionRef.current.longitude) > 0.0001
-    ) {
-      const response = await getAddressFromCoords(
+    const response = await getAddressFromCoords(
         trackRegion.latitude,
         trackRegion.longitude,
       );
       const modifiedAddress = parseAddress(response);
       console.log('modifiedAddress', modifiedAddress);
-      // setLocationDetails(modifiedAddress);
       setLocationDetails({
         street: modifiedAddress.street,
         area: modifiedAddress.area,
@@ -72,7 +76,6 @@ function SelectOnMap({navigation, route}) {
         longitude: trackRegion.longitude,
       });
       setRegion(trackRegion);
-    }
   };
 
   const updateLocation = () => {
@@ -118,19 +121,19 @@ function SelectOnMap({navigation, route}) {
           initialRegion={region}
           onRegionChangeComplete={onRegionChangeComplete}
           provider={PROVIDER_GOOGLE}
-          showsUserLocation={true}
+          showsUserLocation={enableUserLocation}
           showsMyLocationButton={true}
           followsUserLocation={true}>
-          {/* <Marker coordinate={region}>
+          <Marker coordinate={region}>
             <View
               style={{
                 width: 8,
                 height: 8,
-                backgroundColor: 'red',
+                backgroundColor: 'gray',
                 borderRadius: 4,
               }}
             />
-          </Marker> */}
+          </Marker>
         </MapView>
         <View style={style.centerPinWrapper}>
           {activeInput == 'pickup' ? (
@@ -151,14 +154,14 @@ function SelectOnMap({navigation, route}) {
             style={style.backIcon}
           />
         </TouchableOpacity>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={[style.navigaionBtnWrapper, {right: scale(10)}]}>
           <CurrentLocation
             height={scale(18)}
             width={scale(18)}
             style={style.backIcon}
           />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         <Text style={style.header}>Select your location</Text>
 
@@ -264,14 +267,14 @@ const style = StyleSheet.create({
     alignItems: 'center',
     alignSelf: 'flex-start',
     position: 'absolute',
-    top: scale(-40),
+    top: scale(-45),
     elevation: 5,
     borderWidth: 0.3,
     borderColor: 'gray',
   },
   backIcon: {
     color: ThemeColors.text1,
-    margin: scale(7),
+    margin: scale(9),
   },
   centerPinWrapper: {
     position: 'absolute',
@@ -283,7 +286,9 @@ const style = StyleSheet.create({
     top: '50%',
     left: '50%',
     transform: [
-      {translateX: -moderateScale(15)},
+      {translateX: -moderateScale(15
+        
+      )},
       {translateY: -moderateScale(30)},
     ],
     zIndex: 10,

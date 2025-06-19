@@ -1,5 +1,4 @@
 import {
-  Alert,
   FlatList,
   Image,
   StatusBar,
@@ -11,75 +10,40 @@ import {
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {ThemeColors} from '../../constant/Colors';
 import {useCallback, useContext, useEffect, useState} from 'react';
-import Geolocation from 'react-native-geolocation-service';
 import {Bars3Icon, MagnifyingGlassIcon} from 'react-native-heroicons/outline';
 import {moderateScale, scale, verticalScale} from 'react-native-size-matters';
-import {requestLocationPermission} from '../../utils/MapUtils';
+import {
+  getUserCurrentLocation,
+  handleGpsCheck,
+  requestLocationPermission,
+} from '../../utils/MapUtils';
 import {LocationContext} from '../../context/LocationContext';
 import SavedLocationCard from './components/SavedLocationCard';
-import HomeImage from '../../assets/images/svg/homeImage.svg';
-import { savedPlaces } from '../../constant/VehicleData';
+import {savedPlaces} from '../../constant/VehicleData';
 
 function HomeScreen({navigation}) {
   const {setPickupCon} = useContext(LocationContext);
-  const checkGPS = () => {
-    return new Promise((resolve, reject) => {
-      Geolocation.getCurrentPosition(
-        position => resolve(true),
-        error => {
-          if (error.code === 2) resolve(false);
-          else reject(error);
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          forceRequestLocation: true,
-          forceLocationManager: true,
-          showLocationDialog: true,
-        },
-      );
-    });
-  };
 
   const [currentLocation, setCurrentLocation] = useState(null);
-  const [gpsStatus, setGpsStatus] = useState(null);
+
   const handleLocationCheck = async () => {
     const permission = await requestLocationPermission();
     console.log('location permission enabled or not in home:', permission);
 
     if (permission) {
-      const gpsEnabled = await checkGPS();
+      const gpsEnabled = await handleGpsCheck();
       console.log('gps enabled or not in home:', gpsEnabled);
-      setGpsStatus(gpsEnabled);
-
-      if (!gpsEnabled) {
-        Alert.alert('GPS is Off', 'Please enable GPS to use this feature.');
-        return;
-      }
 
       if (gpsEnabled) {
-        Geolocation.getCurrentPosition(
-          async position => {
-            setCurrentLocation({
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude,
-            });
-
-            console.log('latitude Home:', position.coords.latitude);
-            console.log('Longitude Home:', position.coords.longitude);
-          },
-
-          error => {
-            Alert.alert('Error getting location', error.message);
-          },
-          {
-            enableHighAccuracy: true,
-            timeout: 15000,
-            maximumAge: 10000,
-            forceRequestLocation: true,
-            forceLocationManager: true,
-            showLocationDialog: true,
-          },
+        const position = await getUserCurrentLocation();
+        setCurrentLocation({
+          latitude: position.latitude,
+          longitude: position.longitude,
+        });
+        console.log(
+          'user current location',
+          position.latitude,
+          position.longitude,
         );
       }
     }
@@ -109,40 +73,12 @@ function HomeScreen({navigation}) {
         </TouchableOpacity>
       </View>
       <View style={{flex: 1, backgroundColor: ThemeColors.secondary}}>
-        {/* {gpsStatus ? (
-          <>
-            {currentLocation ? (
-              <MapView
-                style={{flex: 1}}
-                initialRegion={{
-                  latitude: currentLocation?.latitude || 11.9386981,
-                  longitude: currentLocation?.longitude || 79.8320056,
-                  latitudeDelta: 0.01,
-                  longitudeDelta: 0.01,
-                }}>
-                <Marker coordinate={currentLocation}>
-                  <MapPinIcon color={ThemeColors.primary} />
-                </Marker>
-              </MapView>
-            ) : (
-              <View style={{flex: 1, justifyContent: 'center'}}>
-                <ActivityIndicator size="large" color={ThemeColors.primary} />
-              </View>
-            )}
-          </>
-        ) : (
-          <View style={{flex:1,justifyContent:"center",alignItems:"center"}}>
-            <Text style={{color: ThemeColors.text1,fontSize:moderateScale(15),fontWeight:"600"}}>
-              Please enable GPS to use this feature.
-            </Text>
-          </View>
-        )} */}
-
-        <FlatList 
-          data={savedPlaces.slice(0,5)}
+        <FlatList
+          data={savedPlaces.slice(0, 5)}
           keyExtractor={(item, index) => index.toString()}
           renderItem={({item}) => <SavedLocationCard item={item} />}
           showsVerticalScrollIndicator={false}
+          contentContainerStyle={{paddingVertical:verticalScale(5)}}
         />
         <Image
           source={require('../../assets/images/png/homeImage.png')}
@@ -151,7 +87,8 @@ function HomeScreen({navigation}) {
             position: 'absolute',
             bottom: 0,
             resizeMode: 'cover',
-            zIndex:10
+            zIndex: 10,
+            opacity:0.25
           }}
         />
       </View>
@@ -173,6 +110,7 @@ const style = StyleSheet.create({
     paddingVertical: verticalScale(15),
     borderBottomWidth: 1,
     borderBottomColor: '#E5E4E2',
+
   },
   searchWrapper: {
     flexDirection: 'row',

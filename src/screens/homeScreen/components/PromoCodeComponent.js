@@ -47,7 +47,7 @@ function PromoCodeComponent({togglePromoModel,appliedPromo ,setAppliedPromo}) {
             style={style.textInput}
           />
         </View>
-        <CustomButton lable={"Apply"} onPress={onPress}  />
+        <CustomButton lable={"Apply"} onPress={onPress} disabled={enteredPromo.length >=4 ? false : true} />
       </View>
     </View>
   );
