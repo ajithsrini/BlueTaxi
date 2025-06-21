@@ -251,6 +251,7 @@ const style = StyleSheet.create({
   safeArea: {
     flex: 1,
     paddingHorizontal: scale(10),
+    backgroundColor:ThemeColors.secondary
   },
   headerWrapper: {
     flexDirection: 'row',
@@ -291,7 +292,7 @@ const style = StyleSheet.create({
   },
 
   pickDropLogoWrapper: {
-    backgroundColor: '#eaeaeaff',
+    backgroundColor: ThemeColors.lightBlue,
     justifyContent: 'center',
     borderRadius: scale(15),
     borderWidth: 0.5,
@@ -314,7 +315,7 @@ const style = StyleSheet.create({
     paddingHorizontal: scale(7),
     marginTop: verticalScale(15),
     marginLeft: scale(10),
-    backgroundColor:"#eaeaeaff"
+    backgroundColor:ThemeColors.lightBlue
   },
   selectMapText: {
     color: ThemeColors.text1,

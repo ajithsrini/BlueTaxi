@@ -33,7 +33,7 @@ function PaymentModel({toggleCashModel, setPaymentMethod, paymentMethod}) {
         style={[
           styles.PaymentMethodMainWrapper,
           {
-            backgroundColor: isSelected ? '#f1f1f1' : '#fbfbfb',
+            backgroundColor: isSelected ? ThemeColors.lightBlue : '#fbfbfb',
             elevation: isSelected ? 5 : 2,
           },
         ]}

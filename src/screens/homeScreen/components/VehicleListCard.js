@@ -33,7 +33,8 @@ export default VehicleListCard;
 
 const style = StyleSheet.create({
   mainWrapper: {
-    backgroundColor: '#fbfbfb',
+    // backgroundColor: '#fbfbfb',
+    backgroundColor:ThemeColors.lightBlue,
     flexDirection: 'row',
     borderRadius: scale(15),
     borderColor: 'gray',

@@ -52,6 +52,7 @@ function HomeScreen({navigation}) {
   useEffect(() => {
     handleLocationCheck();
   }, []);
+  
 
   const navigateToDropLocation = useCallback(() => {
     navigation.navigate('DropLocationSelector');
@@ -62,9 +63,9 @@ function HomeScreen({navigation}) {
     <SafeAreaView style={style.safeArea}>
       <StatusBar barStyle={'dark-content'} />
       <View style={style.headerMainWrapper}>
-        <View style={style.barIconWrapper}>
+        <TouchableOpacity style={style.barIconWrapper} onPress={()=>navigation.toggleDrawer()}>
           <Bars3Icon color={ThemeColors.text1} size={scale(22)} />
-        </View>
+        </TouchableOpacity>
         <TouchableOpacity
           style={style.searchWrapper}
           onPress={navigateToDropLocation}>
@@ -78,7 +79,7 @@ function HomeScreen({navigation}) {
           keyExtractor={(item, index) => index.toString()}
           renderItem={({item}) => <SavedLocationCard item={item} />}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{paddingVertical:verticalScale(5)}}
+          contentContainerStyle={{paddingVertical: verticalScale(5)}}
         />
         <Image
           source={require('../../assets/images/png/homeImage.png')}
@@ -88,7 +89,7 @@ function HomeScreen({navigation}) {
             bottom: 0,
             resizeMode: 'cover',
             zIndex: 10,
-            opacity:0.25
+            opacity: 0.3,
           }}
         />
       </View>
@@ -110,16 +111,15 @@ const style = StyleSheet.create({
     paddingVertical: verticalScale(15),
     borderBottomWidth: 1,
     borderBottomColor: '#E5E4E2',
-
   },
   searchWrapper: {
     flexDirection: 'row',
-    backgroundColor: ThemeColors.lightGray,
+    backgroundColor: ThemeColors.lightBlue,
     alignItems: 'center',
     borderRadius: scale(50),
     paddingHorizontal: scale(10),
     paddingVertical: verticalScale(7),
-    flex: 90,
+    flex: 85,
   },
   searchText: {
     fontSize: scale(14),
@@ -128,7 +128,7 @@ const style = StyleSheet.create({
     marginLeft: scale(10),
   },
   barIconWrapper: {
-    flex: 10,
+    flex: 15,
     alignItems: 'center',
     justifyContent: 'center',
   },

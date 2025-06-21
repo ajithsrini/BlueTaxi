@@ -231,7 +231,7 @@ const style = StyleSheet.create({
   locationCardWrapper: {
     flexDirection: 'row',
     justifyContent: 'center',
-    backgroundColor: '#f8f8f8ff',
+    backgroundColor: ThemeColors.lightBlue,
     paddingHorizontal: scale(5),
     paddingVertical: verticalScale(8),
     borderRadius: scale(10),
@@ -262,7 +262,7 @@ const style = StyleSheet.create({
   },
   navigaionBtnWrapper: {
     borderRadius: scale(50),
-    backgroundColor: ThemeColors.secondary,
+    backgroundColor: ThemeColors.lightBlue,
     justifyContent: 'center',
     alignItems: 'center',
     alignSelf: 'flex-start',

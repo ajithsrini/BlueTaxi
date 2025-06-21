@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
     maxHeight: '50%',
   },
   bookingWrapper: {
-    backgroundColor: ThemeColors.lightGray,
+    backgroundColor: ThemeColors.lightBlue,
     padding: scale(15),
     borderTopLeftRadius: scale(15),
     borderTopRightRadius: scale(15),
@@ -267,19 +267,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: scale(5),
-    backgroundColor: ThemeColors.lightGray,
+    backgroundColor: ThemeColors.lightBlue,
   },
   paymentWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 0.5,
     justifyContent: 'space-between',
-    backgroundColor: ThemeColors.lightGray,
+    backgroundColor: ThemeColors.lightBlue,
   },
   logoTextWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: ThemeColors.lightGray,
+    backgroundColor: ThemeColors.lightBlue,
     flex: 1,
   },
   promoWrapper: {
@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingLeft: scale(10),
     marginLeft: scale(10),
-    backgroundColor: ThemeColors.lightGray,
+    backgroundColor: ThemeColors.lightBlue,
     alignItems: 'center',
   },
   paymentText: {

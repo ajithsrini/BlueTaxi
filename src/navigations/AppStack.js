@@ -1,5 +1,4 @@
 import {
-  CardStyleInterpolators,
   createStackNavigator,
 } from '@react-navigation/stack';
 import HomeScreen from '../screens/homeScreen/HomeScreen';
