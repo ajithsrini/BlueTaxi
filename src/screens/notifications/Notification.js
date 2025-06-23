@@ -34,7 +34,7 @@ function Notification({navigation}) {
           keyExtractor={(item, index) => `${item.id} - ${index}`}
           renderItem={({item}) => <NotificationCard data={item}/>}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{paddingVertical:scale(10)}}
+          contentContainerStyle={{paddingVertical:scale(10 )}}
         />
       </View>
     </SafeAreaView>
